@@ -11,7 +11,7 @@ function config(system, defaults) {
 	self.store = {};
 	self.defaults = defaults;
 
-	fs.readFile('config', function (err, data) {
+	fs.readFile('../config', function (err, data) {
 
 		if (err && err.code == 'ENOENT') {
 			console.log("sef",self.defaults);
@@ -36,7 +36,7 @@ function config(system, defaults) {
 
 	system.on('config_save', function () {
 
-		fs.writeFile('config', JSON.stringify(self.store), function (err) {
+		fs.writeFile('../config', JSON.stringify(self.store), function (err) {
 
 			if (err) {
 				debug('Error saving: ', err);
