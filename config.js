@@ -29,6 +29,10 @@ function config(system, defaults) {
 
 	});
 
+	system.on('config_object', function(cb) {
+		cb(self.store);
+	});
+
 	system.on('config_get', function (key, cb) {
 		debug('config_get(' + key + ')');
 		cb(self.store[key]);
