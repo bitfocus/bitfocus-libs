@@ -1,17 +1,17 @@
 var debug = require('debug')('config');
 var fs    = require('fs');
 
-module.exports = exports = function (system, defaults) {
-	return new config(system, defaults);
+module.exports = exports = function (system, cfgDir, defaults) {
+	return new config(system, cfgDir, defaults);
 };
 
-function config(system, defaults) {
+function config(system, cfgDir, defaults) {
 	var self = this;
 
 	self.store = {};
 	self.defaults = defaults;
 
-	fs.readFile('../config', function (err, data) {
+	fs.readFile(cfgDir + '/config', function (err, data) {
 
 		if (err && err.code == 'ENOENT') {
 			console.log("sef",self.defaults);
@@ -40,7 +40,7 @@ function config(system, defaults) {
 
 	system.on('config_save', function () {
 
-		fs.writeFile('../config', JSON.stringify(self.store), function (err) {
+		fs.writeFile(cfgDir + '/config', JSON.stringify(self.store), function (err) {
 
 			if (err) {
 				debug('Error saving: ', err);
