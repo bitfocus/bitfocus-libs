@@ -11,23 +11,24 @@ function config(system, cfgDir, defaults) {
 	self.store = {};
 	self.defaults = defaults;
 
-	fs.readFile(cfgDir + '/config', function (err, data) {
+	try {
+		var data = fs.readFileSync(cfgDir + '/config');
 
+		self.store = JSON.parse(data);
+		debug('config loaded');
+		system.emit('config_loaded', self.store);
+
+	} catch (err) {
 		if (err && err.code == 'ENOENT') {
 			console.log("sef",self.defaults);
 			self.store = self.defaults;
 			system.emit('config_loaded', self.store);
 			system.emit('config_save');
 			return;
-		};
+		}
 
 		if (err) throw err;
-
-		self.store = JSON.parse(data);
-		debug('config loaded');
-		system.emit('config_loaded', self.store);
-
-	});
+	}
 
 	system.on('config_object', function(cb) {
 		cb(self.store);
