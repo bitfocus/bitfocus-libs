@@ -11,26 +11,10 @@ function config(system, cfgDir, defaults) {
 	self.store = {};
 	self.defaults = defaults;
 
-	try {
-		var data = fs.readFileSync(cfgDir + '/config');
 
-		self.store = JSON.parse(data);
-		debug('config loaded');
-		system.emit('config_loaded', self.store);
-
-	} catch (err) {
-		if (err && err.code == 'ENOENT') {
-			console.log("sef",self.defaults);
-			self.store = self.defaults;
-			system.emit('config_loaded', self.store);
-			system.emit('config_save');
-			return;
-		}
-
-		if (err) throw err;
-	}
 
 	system.on('config_object', function(cb) {
+		debug("config_object()");
 		cb(self.store);
 	});
 
@@ -40,8 +24,9 @@ function config(system, cfgDir, defaults) {
 	});
 
 	system.on('config_save', function () {
-
+		debug("config_save(): begin");
 		fs.writeFile(cfgDir + '/config', JSON.stringify(self.store), function (err) {
+			debug("config_save(): writeFile callback");
 
 			if (err) {
 				debug('Error saving: ', err);
@@ -61,5 +46,28 @@ function config(system, cfgDir, defaults) {
 		self.store[key] = value;
 		system.emit("config_save");
 	});
+
+	try {
+		var data = fs.readFileSync(cfgDir + '/config');
+
+		self.store = JSON.parse(data);
+		debug('config loaded');
+		system.emit('config_loaded', self.store);
+
+	} catch (err) {
+
+		debug("config construct(): catch err", err);
+		debug("ERRCODE:", err.code)
+		if (err && err.code == 'ENOENT') {
+			debug("zomg");
+			self.store = self.defaults;
+			system.emit('config_loaded', self.store);
+			system.emit('config_save');
+			return;
+		}
+
+		if (err) throw err;
+	}
+
 
 };
