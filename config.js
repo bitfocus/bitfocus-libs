@@ -47,27 +47,28 @@ function config(system, cfgDir, defaults) {
 		system.emit("config_save");
 	});
 
-	try {
-		var data = fs.readFileSync(cfgDir + '/config');
+	var config_file = cfgDir + '/config';
 
-		self.store = JSON.parse(data);
-		debug('config loaded');
-		system.emit('config_loaded', self.store);
-
-	} catch (err) {
-
-		debug("config construct(): catch err", err);
-		debug("ERRCODE:", err.code)
-		if (err && err.code == 'ENOENT') {
-			debug("zomg");
-			self.store = self.defaults;
-			system.emit('config_loaded', self.store);
-			system.emit('config_save');
-			return;
-		}
-
-		if (err) throw err;
+	if (!fs.existsSync(cfgDir)) {
+		debug("no config dir exists. creating:",cfgDir);
+		fs.mkdirSync(cfgDir);
 	}
 
+	if (fs.existsSync(config_file)) {
+		debug(config_file,"exists. trying to read");
+		var data = fs.readFileSync(config_file);
+		try {
+			self.store = JSON.parse(data);
+			debug("parsed JSON");
+		} catch(e) {
+			self.store = {};
+			debug("going default");
+		}
+		system.emit('config_loaded', self.store);
+	}
+	else {
+		debug(config_file,"didnt exist. loading blank");
+		system.emit('config_loaded', {} );
+	}
 
 };
