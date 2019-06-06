@@ -84,8 +84,11 @@ function config(system, cfgDir, defaults) {
 		system.emit('config_loaded', self.store);
 	}
 	else {
-		debug(config_file,"didnt exist. loading blank");
-		system.emit('config_loaded', {} );
+		debug(config_file,"didnt exist. loading blank", self.defaults);
+		system.emit('config_loaded', self.defaults );
+		self.store = self.defaults;
+		self.changed = true;
+		system.emit("config_save");
 	}
 
 	setInterval(function () {
